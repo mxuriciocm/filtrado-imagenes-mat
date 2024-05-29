@@ -1,42 +1,65 @@
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
+from tkinter import filedialog
+from tkinter import *
+from tkinter import ttk
+from PIL import Image, ImageTk
 
-# Cargar la imagen
-img = cv2.imread('filtroRuido.jpg', cv2.IMREAD_GRAYSCALE)
+# Definir las funciones de los filtros
+def apply_mean_filter(img):
+    return cv2.blur(img, (5,5))
 
-if img is None:
-    print("Error al cargar la imagen.")
-else:
-    # Aplicar filtro de media
-    mean_filter = cv2.blur(img, (5,5))
+def apply_median_filter(img):
+    return cv2.medianBlur(img, 5)
 
-    # Aplicar filtro de mediana
-    median_filter = cv2.medianBlur(img, 5)
-
-    # Aplicar filtro Laplaciano
+def apply_laplacian_filter(img):
     laplacian_filter = cv2.Laplacian(img, cv2.CV_64F)
-    laplacian_filter = np.uint8(np.absolute(laplacian_filter))
+    return np.uint8(np.absolute(laplacian_filter))
 
-    # Aplicar filtro Sobel
-    sobelx = cv2.Sobel(img, cv2.CV_64F, 1, 0, ksize=5)  # x
-    sobely = cv2.Sobel(img, cv2.CV_64F, 0, 1, ksize=5)  # y
-    sobelx = np.uint8(np.absolute(sobelx))
-    sobely = np.uint8(np.absolute(sobely))
+def apply_sobel_filter_x(img):
+    sobelx = cv2.Sobel(img, cv2.CV_64F, 1, 0, ksize=5)
+    return sobelx
 
-    # Mostrar las imágenes
-    plt.figure(figsize=(12, 8))
-    plt.subplot(2,3,1),plt.imshow(img, cmap = 'gray')
-    plt.title('Original'), plt.xticks([]), plt.yticks([])
-    plt.subplot(2,3,2),plt.imshow(mean_filter, cmap = 'gray')
-    plt.title('Media'), plt.xticks([]), plt.yticks([])
-    plt.subplot(2,3,3),plt.imshow(median_filter, cmap = 'gray')
-    plt.title('Mediana'), plt.xticks([]), plt.yticks([])
-    plt.subplot(2,3,4),plt.imshow(laplacian_filter, cmap = 'gray')
-    plt.title('Laplaciano'), plt.xticks([]), plt.yticks([])
-    plt.subplot(2,3,5),plt.imshow(sobelx, cmap = 'gray')
-    plt.title('Sobel X'), plt.xticks([]), plt.yticks([])
-    plt.subplot(2,3,6),plt.imshow(sobely, cmap = 'gray')
-    plt.title('Sobel Y'), plt.xticks([]), plt.yticks([])
+def apply_sobel_filter_y(img):
+    sobely = cv2.Sobel(img, cv2.CV_64F, 0, 1, ksize=5)
+    return sobely
 
-    plt.show()
+# Función para cargar la imagen
+def load_image():
+    global img, img_label, original_img_label
+    filepath = filedialog.askopenfilename()
+    img = cv2.imread(filepath, cv2.IMREAD_GRAYSCALE)
+    img_tk = ImageTk.PhotoImage(Image.fromarray(img))
+    original_img_label.config(image=img_tk)
+    original_img_label.image = img_tk
+    img_label.config(image=img_tk)
+    img_label.image = img_tk
+
+# Función para mostrar la imagen
+def show_image(img, title):
+    img_tk = ImageTk.PhotoImage(Image.fromarray(img))
+    img_label.config(image=img_tk)
+    img_label.image = img_tk
+
+# Crear la interfaz gráfica
+root = Tk()
+root.geometry("800x600")  # Cambia "800x600" por el tamaño que prefieras
+
+# Crear los botones para cada filtro
+ttk.Button(root, text="Cargar imagen", command=load_image).grid(row=0, column=0, pady=60, padx=10, sticky='ns')
+ttk.Button(root, text="Aplicar filtro de media", command=lambda: show_image(apply_mean_filter(img), 'Media')).grid(row=1, column=0, pady=15, padx=40)
+ttk.Button(root, text="Aplicar filtro de mediana", command=lambda: show_image(apply_median_filter(img), 'Mediana')).grid(row=2, column=0, pady=15, padx=40)
+ttk.Button(root, text="Aplicar filtro Laplaciano", command=lambda: show_image(apply_laplacian_filter(img), 'Laplaciano')).grid(row=3, column=0, pady=15, padx=40)
+ttk.Button(root, text="Aplicar filtro Sobel X", command=lambda: show_image(apply_sobel_filter_x(img), 'Sobel X')).grid(row=4, column=0, pady=15, padx=40)
+ttk.Button(root, text="Aplicar filtro Sobel Y", command=lambda: show_image(apply_sobel_filter_y(img), 'Sobel Y')).grid(row=5, column=0, pady=15, padx=40)
+
+ttk.Label(root, text="Imagen original", background='gray', foreground='white').grid(row=0, column=1, padx=50, pady=10)
+original_img_label = ttk.Label(root)
+original_img_label.grid(row=1, column=1, rowspan=6, padx=10, pady=10)
+
+ttk.Label(root, text="Imagen con filtro aplicado", background='gray', foreground='white').grid(row=0, column=2, padx=50, pady=10)
+img_label = ttk.Label(root)
+img_label.grid(row=1, column=2, rowspan=6, padx=10, pady=10)
+
+root.mainloop()
