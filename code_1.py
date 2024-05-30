@@ -46,13 +46,16 @@ def show_image(img, title):
 root = Tk()
 root.geometry("800x600")  # Cambia "800x600" por el tamaño que prefieras
 
+current_filter_label = ttk.Label(root, text="")
+current_filter_label.grid(row=6, column=0, pady=10, padx=10)
+
 # Crear los botones para cada filtro
 ttk.Button(root, text="Cargar imagen", command=load_image).grid(row=0, column=0, pady=60, padx=10, sticky='ns')
-ttk.Button(root, text="Aplicar filtro de media", command=lambda: show_image(apply_mean_filter(img), 'Media')).grid(row=1, column=0, pady=15, padx=40)
-ttk.Button(root, text="Aplicar filtro de mediana", command=lambda: show_image(apply_median_filter(img), 'Mediana')).grid(row=2, column=0, pady=15, padx=40)
-ttk.Button(root, text="Aplicar filtro Laplaciano", command=lambda: show_image(apply_laplacian_filter(img), 'Laplaciano')).grid(row=3, column=0, pady=15, padx=40)
-ttk.Button(root, text="Aplicar filtro Sobel X", command=lambda: show_image(apply_sobel_filter_x(img), 'Sobel X')).grid(row=4, column=0, pady=15, padx=40)
-ttk.Button(root, text="Aplicar filtro Sobel Y", command=lambda: show_image(apply_sobel_filter_y(img), 'Sobel Y')).grid(row=5, column=0, pady=15, padx=40)
+ttk.Button(root, text="Aplicar filtro de media", command=lambda: (current_filter_label.config(text="Aplicando filtro de media"), show_image(apply_mean_filter(img), 'Media'))).grid(row=1, column=0, pady=15, padx=40)
+ttk.Button(root, text="Aplicar filtro de mediana", command=lambda: (current_filter_label.config(text="Aplicando filtro de mediana"), show_image(apply_median_filter(img), 'Mediana'))).grid(row=2, column=0, pady=15, padx=40)
+ttk.Button(root, text="Aplicar filtro Laplaciano", command=lambda: (current_filter_label.config(text="Aplicando filtro Laplaciano"), show_image(apply_laplacian_filter(img), 'Laplaciano'))).grid(row=3, column=0, pady=15, padx=40)
+ttk.Button(root, text="Aplicar filtro Sobel X", command=lambda: (current_filter_label.config(text="Aplicando filtro Sobel X"), show_image(apply_sobel_filter_x(img), 'Sobel X'))).grid(row=4, column=0, pady=15, padx=40)
+ttk.Button(root, text="Aplicar filtro Sobel Y", command=lambda: (current_filter_label.config(text="Aplicando filtro Sobel Y"), show_image(apply_sobel_filter_y(img), 'Sobel Y'))).grid(row=5, column=0, pady=15, padx=40)
 
 ttk.Label(root, text="Imagen original", background='gray', foreground='white').grid(row=0, column=1, padx=50, pady=10)
 original_img_label = ttk.Label(root)
@@ -63,3 +66,5 @@ img_label = ttk.Label(root)
 img_label.grid(row=1, column=2, rowspan=6, padx=10, pady=10)
 
 root.mainloop()
+
+
